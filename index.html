@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangaru Kutumbams Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 8px;
+        }
+        .kpi-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        .kpi {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+        .kpi h3 {
+            margin-top: 0;
+            color: #7f8c8d;
+        }
+        .kpi h2 {
+            margin-bottom: 0;
+            color: #2c3e50;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .chart-title {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e6f7ff;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .kpi {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Bangaru Kutumbams Dashboard</h1>
+        <p>Comprehensive overview of adoption progress across constituencies</p>
+    </div>
+
+    <div class="kpi-container">
+        <div class="kpi">
+            <h3>Total Bangaru Kutumbams</h3>
+            <h2>64,940</h2>
+        </div>
+        <div class="kpi">
+            <h3>Total Families Covered</h3>
+            <h2>170,803</h2>
+        </div>
+        <div class="kpi">
+            <h3>Total Adopted</h3>
+            <h2>6,502</h2>
+        </div>
+        <div class="kpi">
+            <h3>Yet To Adopt</h3>
+            <h2>58,438</h2>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="chart-container">
+            <h2 class="chart-title">Adoption Status by Constituency</h2>
+            <canvas id="adoptionChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h2 class="chart-title">Margadarsis Mobilized</h2>
+            <canvas id="margadarsisChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h2 class="chart-title">Adoption Rate</h2>
+            <div id="pieChart" style="width:100%; height:400px;"></div>
+        </div>
+        
+        <div class="chart-container">
+            <h2 class="chart-title">Family Members vs Kutumbams</h2>
+            <div id="scatterPlot" style="width:100%; height:400px;"></div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h2 class="chart-title">Detailed Data</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Constituency Name</th>
+                    <th>Total Bangaru Kutumbams</th>
+                    <th>Total Family Members</th>
+                    <th>Total Adopted</th>
+                    <th>Yet To Adopt</th>
+                    <th>Margadarsis Mobilized</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Achanta</td>
+                    <td>7,071</td>
+                    <td>19,148</td>
+                    <td>129</td>
+                    <td>6,942</td>
+                    <td>83</td>
+                </tr>
+                <tr>
+                    <td>Bhimavaram</td>
+                    <td>12,770</td>
+                    <td>34,607</td>
+                    <td>707</td>
+                    <td>12,063</td>
+                    <td>8</td>
+                </tr>
+                <tr>
+                    <td>Narasapuram</td>
+                    <td>8,196</td>
+                    <td>21,933</td>
+                    <td>4</td>
+                    <td>8,192</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>Palacole</td>
+                    <td>7,695</td>
+                    <td>20,918</td>
+                    <td>90</td>
+                    <td>7,605</td>
+                    <td>13</td>
+                </tr>
+                <tr>
+                    <td>Tadepalligudem</td>
+                    <td>9,494</td>
+                    <td>24,186</td>
+                    <td>2,482</td>
+                    <td>7,012</td>
+                    <td>111</td>
+                </tr>
+                <tr>
+                    <td>Tanuku</td>
+                    <td>7,397</td>
+                    <td>18,514</td>
+                    <td>512</td>
+                    <td>6,885</td>
+                    <td>38</td>
+                </tr>
+                <tr>
+                    <td>Undi</td>
+                    <td>9,781</td>
+                    <td>24,869</td>
+                    <td>42</td>
+                    <td>9,739</td>
+                    <td>31</td>
+                </tr>
+                <tr>
+                    <td>Ungutur</td>
+                    <td>2,536</td>
+                    <td>6,628</td>
+                    <td>2,536</td>
+                    <td>0</td>
+                    <td>4</td>
+                </tr>
+                <tr style="font-weight: bold; background-color: #e6f7ff;">
+                    <td>Total</td>
+                    <td>64,940</td>
+                    <td>170,803</td>
+                    <td>6,502</td>
+                    <td>58,438</td>
+                    <td>292</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Adoption Status Chart
+        const ctx1 = document.getElementById('adoptionChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Achanta', 'Bhimavaram', 'Narasapuram', 'Palacole', 'Tadepalligudem', 'Tanuku', 'Undi', 'Ungutur'],
+                datasets: [
+                    {
+                        label: 'Adopted',
+                        data: [129, 707, 4, 90, 2482, 512, 42, 2536],
+                        backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Yet to Adopt',
+                        data: [6942, 12063, 8192, 7605, 7012, 6885, 9739, 0],
+                        backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+
+        // Margadarsis Chart
+        const ctx2 = document.getElementById('margadarsisChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Achanta', 'Bhimavaram', 'Narasapuram', 'Palacole', 'Tadepalligudem', 'Tanuku', 'Undi', 'Ungutur'],
+                datasets: [{
+                    label: 'Margadarsis Mobilized',
+                    data: [83, 8, 4, 13, 111, 38, 31, 4],
+                    backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Pie Chart
+        const pieData = {
+            values: [6502, 58438],
+            labels: ['Adopted', 'Yet to Adopt'],
+            type: 'pie',
+            marker: {
+                colors: ['#2ecc71', '#e74c3c']
+            }
+        };
+        Plotly.newPlot('pieChart', [pieData], {
+            margin: {t: 0, b: 0, l: 0, r: 0}
+        });
+
+        // Scatter Plot
+        const scatterData = {
+            x: [7071, 12770, 8196, 7695, 9494, 7397, 9781, 2536],
+            y: [19148, 34607, 21933, 20918, 24186, 18514, 24869, 6628],
+            text: ['Achanta', 'Bhimavaram', 'Narasapuram', 'Palacole', 'Tadepalligudem', 'Tanuku', 'Undi', 'Ungutur'],
+            mode: 'markers',
+            marker: {
+                size: [8, 8, 8, 8, 11, 8, 8, 4],
+                color: ['#3498db', '#9b59b6', '#e74c3c', '#f1c40f', '#2ecc71', '#1abc9c', '#34495e', '#e67e22']
+            },
+            type: 'scatter'
+        };
+        const scatterLayout = {
+            xaxis: {title: 'Total Bangaru Kutumbams'},
+            yaxis: {title: 'Total Family Members'},
+            hovermode: 'closest'
+        };
+        Plotly.newPlot('scatterPlot', [scatterData], scatterLayout);
+    </script>
+</body>
+</html>
