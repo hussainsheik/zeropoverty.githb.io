@@ -3,667 +3,605 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Margadarsi Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Futuristic Mandal Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <style>
         body {
-            padding: 20px;
-            background-color: #f8f9fa;
+            margin: 0;
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, #0A0A0A 0%, #121212 100%);
+            color: #fff;
+            overflow-x: hidden;
         }
-        .dashboard-header {
-            background-color: #0d6efd;
-            color: white;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+        .hero {
+            height: 50vh; /* Reduced from 80vh */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: linear-gradient(45deg, #0A0A0A, #1a1a1a);
+            overflow: hidden;
         }
-        .filter-section {
-            background-color: white;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0,245,255,0.15), rgba(255,0,245,0.15));
+            animation: glitch 6s infinite;
+            z-index: 0;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0); opacity: 0.15; }
+            2% { transform: translate(1px, -1px); opacity: 0.25; }
+            4% { transform: translate(-1px, 1px); opacity: 0.15; }
+            100% { transform: translate(0); opacity: 0.15; }
+        }
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem; /* Slightly smaller */
+            text-shadow: 0 0 10px #00F5FF, 0 0 20px #FF00F5;
+            z-index: 1;
+            margin: 0;
+        }
+        .navbar {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem;
+            z-index: 1000;
+            text-align: center;
+        }
+        .navbar select {
+            background: #1a1a1a;
+            color: #00FFA3;
+            border: 1px solid #00F5FF;
+            padding: 0.6rem;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 200px;
+            max-width: 100%;
+        }
+        .navbar select:hover {
+            box-shadow: 0 0 12px #00F5FF;
+            transform: scale(1.03);
+        }
+        .content {
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 360px));
+            gap: 1.2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            justify-content: center;
         }
         .card {
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+            backdrop-filter: blur(10px);
+            border: 1px solid transparent;
+            border-image: linear-gradient(45deg, #00F5FF, #FF00F5) 1;
+            border-radius: 10px;
+            padding: 1.2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: move;
+            height: 400px;
+            width: 360px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        .data-table {
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px #00F5FF, 0 0 25px #FF00F5;
+        }
+        .card h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            text-shadow: 0 0 8px #00FFA3;
+            margin: 0 0 0.8rem;
+            text-align: center;
+        }
+        .stats-card {
+            height: 400px;
+            width: 360px;
+            border-image: linear-gradient(45deg, #00FFA3, #FF6F61) 1; /* Unique border for prominence */
+            box-shadow: 0 4px 20px rgba(0,245,255,0.3); /* Enhanced shadow */
+        }
+        .stats-card:hover {
+            box-shadow: 0 0 20px #00FFA3, 0 0 30px #FF6F61;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            flex-grow: 1;
+            padding: 0.5rem;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, rgba(0,245,255,0.1), rgba(255,0,245,0.1));
+            padding: 0.8rem;
+            border-radius: 6px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .stat-box:hover {
+            background: linear-gradient(135deg, rgba(0,245,255,0.2), rgba(255,0,245,0.2));
+            box-shadow: 0 0 12px #00F5FF;
+            transform: scale(1.03);
+        }
+        .stat-box h3 {
+            margin: 0;
+            font-size: 0.85rem;
+            font-weight: 400;
+        }
+        .stat-box p {
+            margin: 0.4rem 0 0;
+            font-size: 1rem;
+            font-weight: bold;
         }
         #map {
-            height: 400px;
-            border-radius: 5px;
+            flex-grow: 1;
+            border-radius: 8px;
+            border: 1px solid #00FFA3;
         }
-        .chart-container {
-            position: relative;
-            height: 300px;
+        #pieChart, #barChart, #stackedBarChart {
+            flex-grow: 1;
             width: 100%;
+            max-height: 320px;
         }
-        .tab-content {
-            padding: 15px 0;
+        @media (max-width: 1024px) {
+            .hero {
+                height: 40vh;
+            }
+            .content {
+                grid-template-columns: repeat(auto-fit, minmax(320px, 320px));
+            }
+            .card, .stats-card {
+                height: 360px;
+                width: 320px;
+            }
+            #pieChart, #barChart, #stackedBarChart {
+                max-height: 280px;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+        @media (max-width: 768px) {
+            .hero {
+                height: 30vh;
+            }
+            .content {
+                grid-template-columns: 1fr;
+                justify-items: center;
+            }
+            .card, .stats-card {
+                height: 360px;
+                width: 100%;
+                max-width: 360px;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .navbar select {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+        .custom-popup .leaflet-popup-content-wrapper {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            font-family: 'Exo 2', sans-serif;
+            border: 1px solid #00F5FF;
+            box-shadow: 0 0 10px #FF00F5;
+            font-size: 0.85rem;
+        }
+        .custom-popup .leaflet-popup-tip {
+            background: #00F5FF;
+        }
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="dashboard-header">
-            <h1>Margadarsi Data Dashboard</h1>
-            <p class="lead">Interactive dashboard with visualizations</p>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="filter-section">
-                    <h4>Filters</h4>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label for="districtFilter" class="form-label">District</label>
-                            <select id="districtFilter" class="form-select">
-                                <option value="">All Districts</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="mandalFilter" class="form-label">Mandal/Municipality</label>
-                            <select id="mandalFilter" class="form-select">
-                                <option value="">All Mandals</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="sectorFilter" class="form-label">Occupation/Sector</label>
-                            <select id="sectorFilter" class="form-select">
-                                <option value="">All Sectors</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="ruralFilter" class="form-label">Rural/Urban</label>
-                            <select id="ruralFilter" class="form-select">
-                                <option value="">All</option>
-                                <option value="Rural">Rural</option>
-                                <option value="Urban">Urban</option>
-                            </select>
-                        </div>
-                    </div>
+    <div class="hero">
+        <canvas class="particles" id="particles"></canvas>
+        <h1>Mandal Insights Dashboard</h1>
+    </div>
+    <div class="navbar">
+        <select id="mandalFilter">
+            <option value="">All Mandals</option>
+        </select>
+    </div>
+    <div class="content" id="sortable">
+        <div class="card stats-card">
+            <h2>Key Metrics</h2>
+            <div class="stats">
+                <div class="stat-box">
+                    <h3>Total Families</h3>
+                    <p id="totalFamilies">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Total Family Members</h3>
+                    <p id="totalFamilyMembers">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Total Adopted</h3>
+                    <p id="totalAdopted">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Yet to Adopt</h3>
+                    <p id="totalBangaruKutumbams">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Margadarsi Mobilized</h3>
+                    <p id="totalMargadarsi">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Total Secretariats</h3>
+                    <p id="totalSecretariats">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Covered Secretariats</h3>
+                    <p id="coveredSecretariats">0</p>
                 </div>
             </div>
         </div>
-
-        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">Summary</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="charts-tab" data-bs-toggle="tab" data-bs-target="#charts" type="button" role="tab">Charts</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-view" type="button" role="tab">Geographical Map</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button" role="tab">Raw Data</button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="dashboardTabsContent">
-            <div class="tab-pane fade show active" id="summary" role="tabpanel">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Summary Statistics</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <div class="card text-white bg-primary">
-                                            <div class="card-body">
-                                                <h6 class="card-title">Total Margadarsi</h6>
-                                                <h2 id="totalCount" class="card-text">0</h2>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="card text-white bg-success">
-                                            <div class="card-body">
-                                                <h6 class="card-title">Rural</h6>
-                                                <h2 id="ruralCount" class="card-text">0</h2>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="card text-white bg-info">
-                                            <div class="card-body">
-                                                <h6 class="card-title">Urban</h6>
-                                                <h2 id="urbanCount" class="card-text">0</h2>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="card text-white bg-warning">
-                                            <div class="card-body">
-                                                <h6 class="card-title">Unique Mandals</h6>
-                                                <h2 id="mandalCount" class="card-text">0</h2>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="charts" role="tabpanel">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Distribution by Mandal</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="mandalChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Distribution by Occupation/Sector</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="sectorChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Rural vs Urban Distribution</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="ruralUrbanChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Top Institutes/Trusts</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="instituteChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="map-view" role="tabpanel">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Geographical Distribution</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="map"></div>
-                        <div class="mt-3">
-                            <small class="text-muted">Note: Locations are approximate based on mandal names</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="data" role="tabpanel">
-                <div class="data-table">
-                    <table id="margadarsiTable" class="table table-striped" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Occupation</th>
-                                <th>Contact</th>
-                                <th>District</th>
-                                <th>Rural/Urban</th>
-                                <th>Mandal</th>
-                                <th>Village/Secretariat</th>
-                                <th>Institute/Trust</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Data will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="card">
+            <h2>Pie Chart: Families vs Adopted</h2>
+            <canvas id="pieChart"></canvas>
+        </div>
+        <div class="card">
+            <h2>Geographical Distribution</h2>
+            <div id="map"></div>
+        </div>
+        <div class="card">
+            <h2>Mandal Comparison</h2>
+            <canvas id="barChart"></canvas>
+        </div>
+        <div class="card">
+            <h2>Secretariats Overview</h2>
+            <canvas id="stackedBarChart"></canvas>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
-        // Replace with your Google Sheet ID and sheet name
-        const GOOGLE_SHEET_ID = 'YOUR_GOOGLE_SHEET_ID_HERE';
-        const SHEET_NAME = 'Form Responses 1';
-        const GOOGLE_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/1YxtKYmBhNEQFUQrq_8bug9Zh_j0CjJ3LzfoCrNpUdhA/edit?gid=1912034455#gid=1912034455/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(Form Responses 1)}`;
-        
-        // Andhra Pradesh coordinates for map centering
-        const AP_COORDINATES = [15.9129, 79.7400];
-        const MAP_ZOOM_LEVEL = 7;
-        
-        // Mandal coordinates (approximate - you should add exact coordinates for better accuracy)
-        const MANDAL_COORDINATES = {
-            'Achanta': [16.5783, 81.4290],
-            'Poduru': [16.7142, 81.6724],
-            'Penumantra': [16.6539, 81.7454],
-            'Penugonda': [16.6539, 81.7454],
-            'Bhimavaram': [16.5405, 81.5230],
-            'Veeravasaram': [16.4976, 81.6329],
-            'Narasapuram': [16.4344, 81.6985],
-            'Mogalturu': [16.4567, 81.6833],
-            'Palakollu': [16.5333, 81.7333],
-            'Elamanchili': [17.5496, 82.8574],
-            'Tadepalligudem': [16.8143, 81.5279],
-            'Pentapadu': [16.4819, 81.2951],
-            'Tanuku': [16.7514, 81.6815],
-            'Iragavaram': [16.7925, 81.6428],
-            'Attili': [16.7000, 81.6000],
-            'Undi': [16.5111, 81.3019],
-            'Palakoderu': [16.5333, 81.3000],
-            'Kalla': [16.5667, 81.2500],
-            'Akiveedu': [16.5833, 81.3833],
-            'Ganapavaram': [16.6333, 81.4333]
-        };
-        
-        let allData = [];
-        let table;
-        let map;
-        let markers = [];
-        let mandalChart, sectorChart, ruralUrbanChart, instituteChart;
-
-        $(document).ready(function() {
-            // Initialize DataTable
-            table = $('#margadarsiTable').DataTable({
-                columns: [
-                    { data: 'Name of the Margadarsi' },
-                    { data: 'Occupation/Sector/Profession/NGO' },
-                    { data: 'Contact number' },
-                    { data: 'Name of the District' },
-                    { data: 'Rural/Urban' },
-                    { data: 'Name of the Mandal/Municipality' },
-                    { data: 'Name of the Secretariat/Village' },
-                    { data: 'Institute/Trust/Commercial Establishment if any' }
-                ],
-                pageLength: 10,
-                responsive: true
-            });
-
-            // Initialize map (but keep it hidden until tab is shown)
-            initMap();
-            
-            // Load data from Google Sheets
-            loadData();
-            
-            // Set up filter event listeners
-            $('#districtFilter, #mandalFilter, #sectorFilter, #ruralFilter').change(function() {
-                applyFilters();
-            });
-            
-            // Initialize charts (they'll be updated when data loads)
-            initCharts();
-            
-            // Update charts when tab is shown
-            $('#charts-tab').on('shown.bs.tab', function() {
-                updateCharts();
-            });
-            
-            // Update map when tab is shown
-            $('#map-tab').on('shown.bs.tab', function() {
-                if (map) {
-                    map.invalidateSize();
-                    updateMap();
-                }
-            });
+        // Particle Background
+        particlesJS('particles', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: ['#00F5FF', '#FF00F5', '#00FFA3'] },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 100, color: '#FF00F5', opacity: 0.2, width: 1 },
+                move: { enable: true, speed: 2, direction: 'none', random: true }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' } },
+                modes: { repulse: { distance: 100 }, push: { particles_nb: 3 } }
+            }
         });
 
-        function initMap() {
-            map = L.map('map').setView(AP_COORDINATES, MAP_ZOOM_LEVEL);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-        }
+        // GSAP Animations
+        gsap.from('.hero h1', { opacity: 0, y: 40, duration: 1.2, ease: 'power3.out' });
+        gsap.from('.navbar', { y: -40, duration: 0.8, delay: 0.2, ease: 'power3.out' });
+        gsap.from('.card', { opacity: 0, y: 80, stagger: 0.15, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: '.content' } });
 
-        function initCharts() {
-            const chartOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.raw} (${context.formattedValue}%)`;
-                            }
-                        }
-                    }
-                }
-            };
-            
-            // Mandal Distribution Chart
-            const mandalCtx = document.getElementById('mandalChart').getContext('2d');
-            mandalChart = new Chart(mandalCtx, {
-                type: 'bar',
-                options: {
-                    ...chartOptions,
-                    indexAxis: 'y',
-                    scales: {
-                        x: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-            
-            // Sector Distribution Chart
-            const sectorCtx = document.getElementById('sectorChart').getContext('2d');
-            sectorChart = new Chart(sectorCtx, {
-                type: 'pie',
-                options: chartOptions
-            });
-            
-            // Rural/Urban Chart
-            const ruralUrbanCtx = document.getElementById('ruralUrbanChart').getContext('2d');
-            ruralUrbanChart = new Chart(ruralUrbanCtx, {
-                type: 'doughnut',
-                options: chartOptions
-            });
-            
-            // Institute Chart
-            const instituteCtx = document.getElementById('instituteChart').getContext('2d');
-            instituteChart = new Chart(instituteCtx, {
-                type: 'bar',
-                options: {
-                    ...chartOptions,
-                    indexAxis: 'y',
-                    scales: {
-                        x: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
+        // Drag-and-Drop with SortableJS
+        new Sortable(document.getElementById('sortable'), {
+            animation: 200,
+            handle: '.card',
+            ghostClass: 'sortable-ghost',
+            onEnd: () => {
+                gsap.from('.card', { opacity: 0.7, scale: 0.98, duration: 0.3, stagger: 0.1 });
+            }
+        });
 
-        function loadData() {
-            fetch(GOOGLE_SHEET_CSV_URL)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.text();
-                })
-                .then(csvText => {
-                    Papa.parse(csvText, {
-                        header: true,
-                        skipEmptyLines: true,
-                        complete: function(results) {
-                            allData = results.data.map(item => {
-                                // Clean up data by trimming whitespace from all fields
-                                const cleanedItem = {};
-                                for (const key in item) {
-                                    cleanedItem[key] = item[key] ? item[key].trim() : '';
-                                }
-                                return cleanedItem;
-                            });
-                            
-                            populateFilters(allData);
-                            updateTable(allData);
-                            updateSummaryStats(allData);
-                            updateCharts();
-                            updateMap();
-                        },
-                        error: function(error) {
-                            console.error('Error parsing CSV:', error);
-                            alert('Error loading data. Please check console for details.');
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    alert('Failed to load data from Google Sheets. Please check the URL and sharing settings.');
+        // Fetch Google Sheet Data
+        const sheetId = '1Z9a7qJPdegiqm-NGQztyOru2LPG2zmK-AAMH_L6RjSs'; // Replace with your Google Sheet ID
+        const sheetName = 'SubLevelData';
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+
+        let data = [];
+        let mandals = new Set();
+
+        async function fetchData() {
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const json = JSON.parse(text.substr(47).slice(0, -2));
+                const rows = json.table.rows;
+
+                data = rows.map(row => ({
+                    MandalName: row.c[1]?.v || '',
+                    TotalFamilies: row.c[2]?.v || 0,
+                    TotalFamilyMembers: row.c[3]?.v || 0,
+                    TotalAdopted: row.c[4]?.v || 0,
+                    TotalMargadarsiMobilized: row.c[6]?.v || 0,
+                    TotalSecretariats: row.c[7]?.v || 0,
+                    CoveredSecretariats: row.c[8]?.v || 0,
+                    TotalBangaruKutumbamsYetToAdopt: (row.c[2]?.v || 0) - (row.c[4]?.v || 0)
+                }));
+
+                // Populate mandal filter
+                data.forEach(row => mandals.add(row.MandalName));
+                const mandalFilter = document.getElementById('mandalFilter');
+                mandals.forEach(m => {
+                    const option = document.createElement('option');
+                    option.value = m;
+                    option.textContent = m;
+                    mandalFilter.appendChild(option);
                 });
+
+                updateDashboard(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
         }
 
-        function populateFilters(data) {
-            // Get unique values for each filter
-            const districts = [...new Set(data.map(item => item['Name of the District']))].filter(Boolean);
-            const mandals = [...new Set(data.map(item => item['Name of the Mandal/Municipality']))].filter(Boolean);
-            const sectors = [...new Set(data.map(item => item['Occupation/Sector/Profession/NGO']))].filter(Boolean);
+        // Initialize Map
+        const map = L.map('map').setView([16.5, 81.5], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
 
-            // Populate district filter
-            const districtFilter = $('#districtFilter');
-            districtFilter.empty().append('<option value="">All Districts</option>');
-            districts.forEach(district => {
-                districtFilter.append(`<option value="${district}">${district}</option>`);
-            });
+        // Simulated coordinates for mandals
+        const mandalCoordinates = {
+            'Achanta (R)': [16.598, 81.824],
+            'Penugonda (R)': [16.654, 81.745],
+            'Penumantra (R)': [16.632, 81.678],
+            'Poduru (R)': [16.578, 81.758],
+            'Bhimavaram (R)': [16.540, 81.523],
+            'Bhimavaram (U)': [16.543, 81.530],
+            'Veeravasaram (R)': [16.533, 81.628],
+            'Mogalturu (R)': [16.418, 81.602],
+            'Narasapur (U)': [16.436, 81.701],
+            'Narasapuram (R)': [16.432, 81.696],
+            'Elamanchili (R)': [16.480, 81.782],
+            'Palakol (R)': [16.517, 81.725],
+            'Palakol (U)': [16.520, 81.730],
+            'Pentapadu (R)': [16.787, 81.525],
+            'Tadepalligudem (R)': [16.813, 81.521],
+            'Tadepalligudem (U)': [16.815, 81.528],
+            'Attili (R)': [16.700, 81.600],
+            'Iragavaram (R)': [16.677, 81.698],
+            'Tanuku (R)': [16.753, 81.677],
+            'Tanuku (U)': [16.757, 81.684],
+            'Akiveedu (R)': [16.582, 81.382],
+            'Akiveedu (U)': [16.585, 81.387],
+            'Kalla (R)': [16.518, 81.413],
+            'Palakoderu (R)': [16.573, 81.563],
+            'Undi (R)': [16.607, 81.463],
+            'Ganapavaram (R)': [16.702, 81.462]
+        };
 
-            // Populate mandal filter
-            const mandalFilter = $('#mandalFilter');
-            mandalFilter.empty().append('<option value="">All Mandals</option>');
-            mandals.forEach(mandal => {
-                mandalFilter.append(`<option value="${mandal}">${mandal}</option>`);
-            });
-
-            // Populate sector filter
-            const sectorFilter = $('#sectorFilter');
-            sectorFilter.empty().append('<option value="">All Sectors</option>');
-            sectors.forEach(sector => {
-                sectorFilter.append(`<option value="${sector}">${sector}</option>`);
+        let markers = [];
+        function updateMap(filteredData) {
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            filteredData.forEach(row => {
+                const coords = mandalCoordinates[row.MandalName];
+                if (coords) {
+                    const marker = L.circleMarker(coords, {
+                        radius: 8,
+                        fillColor: '#00F5FF',
+                        color: '#FF00F5',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.7
+                    }).addTo(map).bindPopup(
+                        `<b>${row.MandalName}</b><br>
+                        Total Families: ${row.TotalFamilies}<br>
+                        Total Adopted: ${row.TotalAdopted}<br>
+                        Yet to Adopt: ${row.TotalBangaruKutumbamsYetToAdopt}`,
+                        { className: 'custom-popup' }
+                    );
+                    markers.push(marker);
+                }
             });
         }
 
-        function applyFilters() {
-            const district = $('#districtFilter').val();
-            const mandal = $('#mandalFilter').val();
-            const sector = $('#sectorFilter').val();
-            const ruralUrban = $('#ruralFilter').val();
+        // Pie Chart
+        const pieChart = new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Total Families', 'Total Adopted'],
+                datasets: [{
+                    data: [0, 0],
+                    backgroundColor: ['#00F5FF', '#FF00F5'],
+                    borderColor: '#121212',
+                    borderWidth: 1,
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { labels: { color: '#fff', font: { family: 'Exo 2', size: 12 } } },
+                    tooltip: { backgroundColor: 'rgba(0,0,0,0.9)', bodyFont: { family: 'Exo 2', size: 12 }, titleFont: { family: 'Orbitron', size: 14 } }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true,
+                    duration: 800
+                },
+                maintainAspectRatio: false
+            }
+        });
 
-            let filteredData = allData.filter(item => {
-                return (!district || item['Name of the District'] === district) &&
-                       (!mandal || item['Name of the Mandal/Municipality'] === mandal) &&
-                       (!sector || item['Occupation/Sector/Profession/NGO'] === sector) &&
-                       (!ruralUrban || item['Rural/Urban'] === ruralUrban);
-            });
+        // Bar Chart
+        const barChart = new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Total Families',
+                        data: [],
+                        backgroundColor: '#00F5FF',
+                        borderColor: '#121212',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Total Family Members',
+                        data: [],
+                        backgroundColor: '#FF00F5',
+                        borderColor: '#121212',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Total Adopted',
+                        data: [],
+                        backgroundColor: '#00FFA3',
+                        borderColor: '#121212',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Margadarsi Mobilized',
+                        data: [],
+                        backgroundColor: '#FF6F61',
+                        borderColor: '#121212',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                plugins: {
+                    legend: { labels: { color: '#fff', font: { family: 'Exo 2', size: 12 } } },
+                    title: { display: true, text: 'Mandal Metrics Comparison', color: '#fff', font: { family: 'Orbitron', size: 14 } },
+                    tooltip: { backgroundColor: 'rgba(0,0,0,0.9)', bodyFont: { family: 'Exo 2', size: 12 }, titleFont: { family: 'Orbitron', size: 14 } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#fff', font: { family: 'Exo 2', size: 12 } }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { ticks: { color: '#fff', font: { family: 'Exo 2', size: 12 } }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                },
+                animation: {
+                    duration: 800,
+                    easing: 'easeOutQuart'
+                },
+                maintainAspectRatio: false
+            }
+        });
 
-            updateTable(filteredData);
-            updateSummaryStats(filteredData);
-            updateCharts(filteredData);
+        // Stacked Bar Chart
+        const stackedBarChart = new Chart(document.getElementById('stackedBarChart'), {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Covered Secretariats',
+                        data: [],
+                        backgroundColor: '#00F5FF',
+                        borderColor: '#121212',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Uncovered Secretariats',
+                        data: [],
+                        backgroundColor: '#FF00F5',
+                        borderColor: '#121212',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                plugins: {
+                    legend: { labels: { color: '#fff', font: { family: 'Exo 2', size: 12 } } },
+                    title: { display: true, text: 'Secretariats Coverage', color: '#fff', font: { family: 'Orbitron', size: 14 } },
+                    tooltip: { backgroundColor: 'rgba(0,0,0,0.9)', bodyFont: { family: 'Exo 2', size: 12 }, titleFont: { family: 'Orbitron', size: 14 } }
+                },
+                scales: {
+                    x: { stacked: true, ticks: { color: '#fff', font: { family: 'Exo 2', size: 12 } }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    y: { stacked: true, beginAtZero: true, ticks: { color: '#fff', font: { family: 'Exo 2', size: 12 } }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                },
+                animation: {
+                    duration: 800,
+                    easing: 'easeOutQuart'
+                },
+                maintainAspectRatio: false
+            }
+        });
+
+        function updateDashboard(filteredData) {
+            const totals = filteredData.reduce((acc, row) => {
+                acc.families += row.TotalFamilies;
+                acc.members += row.TotalFamilyMembers;
+                acc.adopted += row.TotalAdopted;
+                acc.bangaru += row.TotalBangaruKutumbamsYetToAdopt;
+                acc.margadarsi += row.TotalMargadarsiMobilized;
+                acc.secretariats += row.TotalSecretariats;
+                acc.covered += row.CoveredSecretariats;
+                return acc;
+            }, { families: 0, members: 0, adopted: 0, bangaru: 0, margadarsi: 0, secretariats: 0, covered: 0 });
+
+            document.getElementById('totalFamilies').textContent = totals.families;
+            document.getElementById('totalFamilyMembers').textContent = totals.members;
+            document.getElementById('totalAdopted').textContent = totals.adopted;
+            document.getElementById('totalBangaruKutumbams').textContent = totals.bangaru;
+            document.getElementById('totalMargadarsi').textContent = totals.margadarsi;
+            document.getElementById('totalSecretariats').textContent = totals.secretariats;
+            document.getElementById('coveredSecretariats').textContent = totals.covered;
+
+            // Update Pie Chart
+            pieChart.data.datasets[0].data = [totals.families, totals.adopted];
+            pieChart.update();
+
+            // Update Bar Chart
+            barChart.data.labels = filteredData.map(row => row.MandalName);
+            barChart.data.datasets[0].data = filteredData.map(row => row.TotalFamilies);
+            barChart.data.datasets[1].data = filteredData.map(row => row.TotalFamilyMembers);
+            barChart.data.datasets[2].data = filteredData.map(row => row.TotalAdopted);
+            barChart.data.datasets[3].data = filteredData.map(row => row.TotalMargadarsiMobilized);
+            barChart.update();
+
+            // Update Stacked Bar Chart
+            stackedBarChart.data.labels = filteredData.map(row => row.MandalName);
+            stackedBarChart.data.datasets[0].data = filteredData.map(row => row.CoveredSecretariats);
+            stackedBarChart.data.datasets[1].data = filteredData.map(row => row.TotalSecretariats - row.CoveredSecretariats);
+            stackedBarChart.update();
+
             updateMap(filteredData);
         }
 
-        function updateTable(data) {
-            table.clear();
-            table.rows.add(data);
-            table.draw();
-        }
+        // Filter Logic
+        document.getElementById('mandalFilter').addEventListener('change', updateFilters);
 
-        function updateSummaryStats(data) {
-            $('#totalCount').text(data.length);
-            
-            const rural = data.filter(item => item['Rural/Urban'] === 'Rural').length;
-            $('#ruralCount').text(rural);
-            
-            const urban = data.filter(item => item['Rural/Urban'] === 'Urban').length;
-            $('#urbanCount').text(urban);
-            
-            const uniqueMandalCount = new Set(data.map(item => item['Name of the Mandal/Municipality'])).size;
-            $('#mandalCount').text(uniqueMandalCount);
-        }
+        function updateFilters() {
+            const mandal = document.getElementById('mandalFilter').value;
+            let filteredData = data;
 
-        function updateCharts(data = allData) {
-            // Mandal Distribution
-            const mandalCounts = {};
-            data.forEach(item => {
-                const mandal = item['Name of the Mandal/Municipality'] || 'Unknown';
-                mandalCounts[mandal] = (mandalCounts[mandal] || 0) + 1;
-            });
-            
-            const sortedMandalData = Object.entries(mandalCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10); // Show top 10
-            
-            updateChart(mandalChart, {
-                type: 'bar',
-                data: {
-                    labels: sortedMandalData.map(item => item[0]),
-                    datasets: [{
-                        label: 'Number of Margadarsi',
-                        data: sortedMandalData.map(item => item[1]),
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)'
-                    }]
-                }
-            });
-            
-            // Sector Distribution
-            const sectorCounts = {};
-            data.forEach(item => {
-                const sector = item['Occupation/Sector/Profession/NGO'] || 'Unknown';
-                sectorCounts[sector] = (sectorCounts[sector] || 0) + 1;
-            });
-            
-            updateChart(sectorChart, {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(sectorCounts),
-                    datasets: [{
-                        data: Object.values(sectorCounts),
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.7)',
-                            'rgba(54, 162, 235, 0.7)',
-                            'rgba(255, 206, 86, 0.7)',
-                            'rgba(75, 192, 192, 0.7)',
-                            'rgba(153, 102, 255, 0.7)',
-                            'rgba(255, 159, 64, 0.7)'
-                        ]
-                    }]
-                }
-            });
-            
-            // Rural/Urban Distribution
-            const ruralUrbanCounts = {
-                'Rural': data.filter(item => item['Rural/Urban'] === 'Rural').length,
-                'Urban': data.filter(item => item['Rural/Urban'] === 'Urban').length,
-                'Unknown': data.filter(item => !item['Rural/Urban'] || !['Rural','Urban'].includes(item['Rural/Urban'])).length
-            };
-            
-            updateChart(ruralUrbanChart, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(ruralUrbanCounts).filter(k => ruralUrbanCounts[k] > 0),
-                    datasets: [{
-                        data: Object.values(ruralUrbanCounts).filter(v => v > 0),
-                        backgroundColor: [
-                            'rgba(75, 192, 192, 0.7)',
-                            'rgba(255, 99, 132, 0.7)',
-                            'rgba(201, 203, 207, 0.7)'
-                        ]
-                    }]
-                }
-            });
-            
-            // Institute/Trust Distribution
-            const instituteCounts = {};
-            data.forEach(item => {
-                const institute = item['Institute/Trust/Commercial Establishment if any'] || 'Unknown';
-                if (institute && institute !== 'Unknown') {
-                    instituteCounts[institute] = (instituteCounts[institute] || 0) + 1;
-                }
-            });
-            
-            const sortedInstituteData = Object.entries(instituteCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10); // Show top 10
-            
-            updateChart(instituteChart, {
-                type: 'bar',
-                data: {
-                    labels: sortedInstituteData.map(item => item[0]),
-                    datasets: [{
-                        label: 'Number of Margadarsi',
-                        data: sortedInstituteData.map(item => item[1]),
-                        backgroundColor: 'rgba(153, 102, 255, 0.7)'
-                    }]
-                }
-            });
-        }
-
-        function updateChart(chart, config) {
-            chart.data = config.data;
-            chart.type = config.type;
-            chart.update();
-        }
-
-        function updateMap(data = allData) {
-            // Clear existing markers
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
-            
-            // Group data by mandal
-            const mandalGroups = {};
-            data.forEach(item => {
-                const mandal = item['Name of the Mandal/Municipality'] || 'Unknown';
-                if (!mandalGroups[mandal]) {
-                    mandalGroups[mandal] = [];
-                }
-                mandalGroups[mandal].push(item);
-            });
-            
-            // Add markers for each mandal
-            for (const mandal in mandalGroups) {
-                const count = mandalGroups[mandal].length;
-                const coordinates = MANDAL_COORDINATES[mandal] || AP_COORDINATES;
-                
-                // Create a custom icon
-                const icon = L.divIcon({
-                    className: 'custom-marker',
-                    html: `<div style="background-color: #0d6efd; color: white; border-radius: 50%; width: ${20 + count}px; height: ${20 + count}px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${count}</div>`,
-                    iconSize: [30 + count, 30 + count],
-                    iconAnchor: [15 + count/2, 15 + count/2]
-                });
-                
-                const marker = L.marker(coordinates, { icon: icon })
-                    .bindPopup(`<b>${mandal}</b><br>Margadarsi Count: ${count}`)
-                    .addTo(map);
-                
-                markers.push(marker);
+            if (mandal) {
+                filteredData = filteredData.filter(row => row.MandalName === mandal);
             }
-            
-            // Fit map to show all markers if there are any
-            if (markers.length > 0) {
-                const group = new L.featureGroup(markers);
-                map.fitBounds(group.getBounds().pad(0.2));
-            } else {
-                map.setView(AP_COORDINATES, MAP_ZOOM_LEVEL);
-            }
+
+            updateDashboard(filteredData);
         }
+
+        // Initialize
+        fetchData();
     </script>
 </body>
 </html>
